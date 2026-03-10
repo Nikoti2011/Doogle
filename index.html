@@ -1,84 +1,486 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Doogle</title>
-    <link rel="icon" href="Dogle_Logo.jpg">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doogle</title>
+  <link rel="icon" href="Dogle_Logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1a1a1a;
+      --surface: #242424;
+      --surface2: #2e2e2e;
+      --border: #3a3a3a;
+      --purple: #9b59f7;
+      --purple-dim: #6b34c9;
+      --purple-glow: rgba(155, 89, 247, 0.15);
+      --white: #f0f0f0;
+      --muted: #888;
+      --sidebar-w: 72px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 0;
+      gap: 6px;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebar-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--white);
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      font-size: 9px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.2;
+      padding: 4px;
+    }
+    .sidebar-btn:hover {
+      background: var(--purple-glow);
+      border-color: var(--purple);
+      color: var(--purple);
+      transform: scale(1.06);
+    }
+    #add-side-btn {
+      background: transparent;
+      border-color: var(--purple);
+      color: var(--purple);
+      font-size: 20px;
+    }
+    #add-side-btn:hover {
+      background: var(--purple);
+      color: #fff;
+    }
+
+    /* ── MAIN ── */
+    #main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 24px 120px;
+      min-height: 100vh;
+    }
+
+    /* logo */
+    #logo {
+      width: 160px;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 0 18px var(--purple));
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* wow text */
+    #wow-text {
+      font-family: 'Comic Neue', cursive;
+      font-size: 13px;
+      color: var(--purple);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadein 0.6s 0.3s forwards;
+    }
+    @keyframes fadein { to { opacity: 1; } }
+
+    /* search */
+    #search-form {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 620px;
+      margin-bottom: 48px;
+    }
+
+    #search-bar {
+      flex: 1;
+      height: 48px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--white);
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      padding: 0 18px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #search-bar::placeholder { color: var(--muted); }
+    #search-bar:focus { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-glow); }
+
+    #search-btn {
+      height: 48px;
+      padding: 0 22px;
+      background: var(--purple);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    #search-btn:hover { background: var(--purple-dim); transform: scale(1.03); }
+    #search-btn:active { transform: scale(0.98); }
+
+    /* quick links grid */
+    #quick-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      width: 100%;
+      max-width: 620px;
+    }
+
+    .quick-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 8px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--white);
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      font-size: 13px;
+      transition: all 0.15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .quick-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--purple-glow);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .quick-card:hover { border-color: var(--purple); transform: translateY(-3px); }
+    .quick-card:hover::before { opacity: 1; }
+
+    .quick-card .card-icon {
+      font-size: 26px;
+    }
+
+    #add-card-btn {
+      background: transparent;
+      border-color: var(--purple);
+      color: var(--purple);
+    }
+    #add-card-btn:hover { background: var(--purple); color: #fff; }
+
+    /* footer */
+    #footer {
+      position: fixed;
+      bottom: 0;
+      left: var(--sidebar-w);
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    #footer a { color: var(--purple); text-decoration: none; }
+    #footer a:hover { text-decoration: underline; }
+
+    .footer-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--white);
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .footer-btn:hover { border-color: var(--purple); color: var(--purple); }
+
+    /* modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--purple);
+      border-radius: 16px;
+      padding: 28px;
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal h3 {
+      font-family: 'Comic Neue', cursive;
+      font-size: 18px;
+      color: var(--purple);
+    }
+    .modal input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--white);
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      padding: 10px 14px;
+      outline: none;
+    }
+    .modal input:focus { border-color: var(--purple); }
+    .modal-actions { display: flex; gap: 8px; }
+    .modal-actions button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .modal-actions button:hover { opacity: 0.85; }
+    .btn-confirm { background: var(--purple); color: #fff; }
+    .btn-cancel { background: var(--surface2); color: var(--white); border: 1px solid var(--border); }
+
+    /* doge floating memes */
+    .meme-float {
+      position: fixed;
+      pointer-events: none;
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      color: var(--purple);
+      font-size: 14px;
+      animation: floatUp 3s ease-out forwards;
+      z-index: 500;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) rotate(-5deg); }
+      100% { opacity: 0; transform: translateY(-120px) rotate(10deg); }
+    }
+  </style>
 </head>
 <body>
-    <div id="menutest">
-        <ul>
-            <li>
-                <button id="addstuffside" onclick="addbuttonside()">+</button>
-            </li>
-            <li>
-                <a href="https://www.youtube.com">
-                    <button id="ytside">YouTube</button>
-                </a>
-            </li>
-            <li>
-                <a href="https://github.com">
-                    <button id="githubside">GitHub</button>
-                </a>
-            </li>
-            <li>
-                <a href="https://chat.openai.com/">
-                    <button id="chatgptside">ChatGPT</button>
-                </a> 
-            </li>
-            <li>
-                <a href="https://translate.google.com/">
-                    <button id="traductorside">Translator</button>
-                </a>
-            </li>
-            <li>
-                <a href="https://discord.com/app">
-                    <button id="discordside">Discord</button>
-                </a>
-            </li>
-            <li>
-                <a href="https://code.byjusfutureschool.com/s/dashboard">
-                    <button id="byjusside">BYJU'S</button>
-                </a>
-            </li>
-            <li>
-                <a href="https://us05web.zoom.us/j/9921759780?pwd=MFFMWTRQU0Y4SVZMNVMxVVE3a1grZz09#success">
-                    <button id="alemanside">Aleman</button>
-                </a>
-            </li>
-            <li>
-                <a href="https://twitter.com/home">
-                    <button id="twitterside">Twitter</button>
-                </a>
-            </li>
-        </ul>
-    </div>   
-    <img id="main-image" src="D.png">     
-    <form action="https://www.google.com/search" method="get">
-        <input type="text" name="q" id="search-bar" placeholder="Search on Doogle!!">
-        <input type="submit" value="Search" id="search-button">
-    </form>
-    <div id="buttonmenu">
-        <button id="addstuff" onclick="addbutton()">+</button>
-        <a href="https://www.youtube.com">
-            <button id="yt">YouTube</button>
-        </a>
-        <a href="https://github.com">
-            <button id="github">GitHub</button>
-        </a>
-        <a href="https://chat.openai.com/">
-            <button id="chatgpt">ChatGPT</button>
-        </a>
-        
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <button class="sidebar-btn" id="add-side-btn" title="Add link" onclick="openModal('sidebar')">+</button>
+  <a href="https://www.youtube.com" target="_blank"><button class="sidebar-btn">You Tube</button></a>
+  <a href="https://github.com" target="_blank"><button class="sidebar-btn">Git Hub</button></a>
+  <a href="https://claude.ai" target="_blank"><button class="sidebar-btn">Claude AI</button></a>
+  <a href="https://translate.google.com" target="_blank"><button class="sidebar-btn">Trans late</button></a>
+  <a href="https://discord.com/app" target="_blank"><button class="sidebar-btn">Dis cord</button></a>
+  <a href="https://twitter.com/home" target="_blank"><button class="sidebar-btn">Twitter / X</button></a>
+  <div id="sidebar-custom"></div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+  <img id="logo" src="Dnoback.png" alt="Doogle Logo">
+  <p id="wow-text">wow. such search. very internet. 🐕</p>
+
+  <form id="search-form" action="https://www.google.com/search" method="get">
+    <input type="text" name="q" id="search-bar" placeholder="much search... very web...">
+    <button type="submit" id="search-btn">Doogle!</button>
+  </form>
+
+  <div id="quick-links">
+    <a href="https://www.youtube.com" target="_blank" class="quick-card">
+      <span class="card-icon">📺</span>YouTube
+    </a>
+    <a href="https://github.com" target="_blank" class="quick-card">
+      <span class="card-icon">🐙</span>GitHub
+    </a>
+    <a href="https://claude.ai" target="_blank" class="quick-card">
+      <span class="card-icon">🤖</span>Claude AI
+    </a>
+    <a href="https://translate.google.com" target="_blank" class="quick-card">
+      <span class="card-icon">🌐</span>Translate
+    </a>
+    <button class="quick-card" id="add-card-btn" onclick="openModal('card')">
+      <span class="card-icon">＋</span>Add Link
+    </button>
+    <div id="cards-custom"></div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <span>made by <strong style="color:var(--purple)">Nikoti</strong> · such code · very doge</span>
+  <div style="display:flex;gap:8px">
+    <button class="footer-btn" onclick="goGame()">🎮 Doogle Click</button>
+    <button class="footer-btn" onclick="confirmReset()">Reset Links</button>
+  </div>
+</footer>
+
+<!-- ADD LINK MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>wow. new link. very add. 🐕</h3>
+    <input type="text" id="modal-url" placeholder="https://...">
+    <input type="text" id="modal-name" placeholder="Button name">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmAdd()">Add it!</button>
     </div>
-    <center>
-    <br><br><br><br><br><br><br><br>
-    <br><br><br><br><br><br><br><br>
-    <div id="bottom">
-    <a href="https://www.meistertask.com/app/project/oDLClSyB/doogle">Want to help me with ideas? Click this text</a>
-    <h6>Made by: Nikolai. Logo by: Canvas and Nikolai. Coding by: Nikolai and ChatGPT</h6>
-    <button onclick="game()">NEW! Doogle Game v.1</button>
-    </div>
-    </center>
-    <script src="script.js"></script>
+  </div>
+</div>
+
+<script>
+  let addTarget = 'card';
+
+  // ── load saved custom links ──
+  function loadLinks() {
+    const sideLinks = JSON.parse(localStorage.getItem('sideLinks') || '[]');
+    const cardLinks = JSON.parse(localStorage.getItem('cardLinks') || '[]');
+
+    sideLinks.forEach(l => appendSideLink(l.url, l.name));
+    cardLinks.forEach(l => appendCard(l.url, l.name));
+  }
+
+  function appendSideLink(url, name) {
+    const a = document.createElement('a');
+    a.href = url; a.target = '_blank';
+    const btn = document.createElement('button');
+    btn.className = 'sidebar-btn';
+    btn.textContent = name.slice(0, 8);
+    btn.title = name;
+    a.appendChild(btn);
+    document.getElementById('sidebar-custom').appendChild(a);
+  }
+
+  function appendCard(url, name) {
+    const a = document.createElement('a');
+    a.href = url; a.target = '_blank';
+    a.className = 'quick-card';
+    a.innerHTML = `<span class="card-icon">🔗</span>${name}`;
+    document.getElementById('cards-custom').appendChild(a);
+  }
+
+  // ── modal ──
+  function openModal(target) {
+    addTarget = target;
+    document.getElementById('modal').classList.add('open');
+    document.getElementById('modal-url').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.getElementById('modal-url').value = '';
+    document.getElementById('modal-name').value = '';
+  }
+
+  function confirmAdd() {
+    let url = document.getElementById('modal-url').value.trim();
+    const name = document.getElementById('modal-name').value.trim();
+    if (!url || !name) return;
+    if (!url.startsWith('http')) url = 'https://' + url;
+
+    if (addTarget === 'sidebar') {
+      appendSideLink(url, name);
+      const saved = JSON.parse(localStorage.getItem('sideLinks') || '[]');
+      saved.push({ url, name });
+      localStorage.setItem('sideLinks', JSON.stringify(saved));
+    } else {
+      appendCard(url, name);
+      const saved = JSON.parse(localStorage.getItem('cardLinks') || '[]');
+      saved.push({ url, name });
+      localStorage.setItem('cardLinks', JSON.stringify(saved));
+    }
+    closeModal();
+  }
+
+  // ── meme floaters on search ──
+  const memes = ['wow','such search','very google','much query','so internet','amaze','wow','doge approve'];
+  document.getElementById('search-btn').addEventListener('click', function(e) {
+    const q = document.getElementById('search-bar').value.trim();
+    if (!q) { e.preventDefault(); spawnMeme('much empty. very blank.', e); return; }
+    spawnMeme(memes[Math.floor(Math.random()*memes.length)], e);
+  });
+
+  function spawnMeme(text, e) {
+    const el = document.createElement('div');
+    el.className = 'meme-float';
+    el.textContent = text;
+    el.style.left = (e.clientX - 30) + 'px';
+    el.style.top = (e.clientY - 10) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
+  function goGame() { window.location.href = 'index2.html'; }
+
+  function confirmReset() {
+    if (confirm('wow. reset all custom links? very sure?')) {
+      localStorage.removeItem('sideLinks');
+      localStorage.removeItem('cardLinks');
+      document.getElementById('sidebar-custom').innerHTML = '';
+      document.getElementById('cards-custom').innerHTML = '';
+    }
+  }
+
+  // close modal on overlay click
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // enter key in modal
+  document.getElementById('modal-name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmAdd();
+  });
+
+  document.addEventListener('DOMContentLoaded', loadLinks);
+</script>
 </body>
 </html>

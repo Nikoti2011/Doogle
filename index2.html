@@ -1,31 +1,376 @@
-<html>
-    <head>
-        <title>Doogle Click</title>
-        <link rel="stylesheet" href="style2.css">
-        <script src="script2.js"></script>
-    </head>
-    <body>
-        <img src="Doogle Click.png">
-        <h2>Welcome to Doogle Click</h2>
-        <p>How to play: First, click the button below to earn money. With that money, you can buy upgrades that help you earn more money. Start the game below.</p>
-        <div id="game">
-            <img src="doge.png">
-            <br>
-            <br>
-            <button id="clickme" onclick="masuno()">Click Me</button>
-            <div id="buymenu">
-                <h4>Shop:</h4>
-                <h6 id="money">Money: 0</h6>
-                <button onclick="cps1()" class="upgrade">+1 money per click</button>
-                <h6 id="cps1c">Cost: 10 Money</h6>
-                <button onclick="cps10()" class="upgrade">+10 money per click</button>
-                <h6 id="cps10c">Cost: 100 Money</h6>
-                <button onclick="cps100()" class="upgrade">+100 money per click</button>
-                <h6 id="cps100c">Cost: 1000 Money</h6>
-            </div>
-        </div>
-        <br>
-        <button onclick="home()">Home</button>
-        <button onclick="reset()">Reset Game</button>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doogle Click</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1a1a1a;
+      --surface: #242424;
+      --surface2: #2e2e2e;
+      --border: #3a3a3a;
+      --purple: #9b59f7;
+      --purple-dim: #6b34c9;
+      --purple-glow: rgba(155, 89, 247, 0.15);
+      --white: #f0f0f0;
+      --muted: #888;
+      --green: #3ecf8e;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px 60px;
+    }
+
+    h1 {
+      font-family: 'Comic Neue', cursive;
+      font-size: 32px;
+      color: var(--purple);
+      margin-bottom: 6px;
+      text-shadow: 0 0 20px var(--purple);
+    }
+
+    .subtitle {
+      font-family: 'Comic Neue', cursive;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+
+    /* money display */
+    #money-display {
+      background: var(--surface);
+      border: 1px solid var(--purple);
+      border-radius: 14px;
+      padding: 14px 36px;
+      font-size: 24px;
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      color: var(--green);
+      margin-bottom: 10px;
+      box-shadow: 0 0 20px var(--purple-glow);
+    }
+
+    #cps-display {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 32px;
+      font-family: 'Comic Neue', cursive;
+    }
+
+    /* doge click button */
+    #doge-btn {
+      background: none;
+      border: 3px solid var(--purple);
+      border-radius: 50%;
+      padding: 6px;
+      cursor: pointer;
+      transition: transform 0.08s, box-shadow 0.1s;
+      position: relative;
+      margin-bottom: 40px;
+      box-shadow: 0 0 30px var(--purple-glow);
+    }
+    #doge-btn:hover { box-shadow: 0 0 50px rgba(155,89,247,0.3); }
+    #doge-btn:active { transform: scale(0.93); }
+    #doge-btn img {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* click animation */
+    .click-pop {
+      position: fixed;
+      pointer-events: none;
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--green);
+      animation: popUp 0.8s ease-out forwards;
+      z-index: 500;
+    }
+    @keyframes popUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-70px) scale(1.3); }
+    }
+
+    /* meme floaters */
+    .meme-word {
+      position: fixed;
+      pointer-events: none;
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--purple);
+      animation: floatSide 2s ease-out forwards;
+      z-index: 499;
+    }
+    @keyframes floatSide {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(-90px) rotate(15deg); }
+    }
+
+    /* shop */
+    #shop {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    #shop h2 {
+      font-family: 'Comic Neue', cursive;
+      font-size: 18px;
+      color: var(--purple);
+      margin-bottom: 16px;
+    }
+
+    .shop-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      transition: border-color 0.15s;
+    }
+    .shop-item:hover { border-color: var(--purple); }
+
+    .shop-info { flex: 1; }
+    .shop-name {
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--white);
+    }
+    .shop-desc {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .shop-cost {
+      font-family: 'Comic Neue', cursive;
+      font-size: 12px;
+      color: var(--green);
+      text-align: right;
+      margin-right: 12px;
+      min-width: 70px;
+    }
+
+    .buy-btn {
+      background: var(--surface);
+      border: 1px solid var(--purple);
+      border-radius: 8px;
+      color: var(--purple);
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 7px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .buy-btn:hover { background: var(--purple); color: #fff; }
+    .buy-btn:disabled { opacity: 0.35; cursor: not-allowed; border-color: var(--border); color: var(--muted); }
+    .buy-btn:disabled:hover { background: var(--surface); color: var(--muted); }
+
+    /* footer buttons */
+    .footer-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .nav-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--white);
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 22px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .nav-btn:hover { border-color: var(--purple); color: var(--purple); }
+    .nav-btn.danger:hover { border-color: #e74c3c; color: #e74c3c; }
+  </style>
+</head>
+<body>
+
+  <h1>🐕 Doogle Click</h1>
+  <p class="subtitle">much click · very money · such upgrade · wow</p>
+
+  <div id="money-display">💰 <span id="money-val">0</span> DogeBux</div>
+  <div id="cps-display">+<span id="cps-val">1</span> per click</div>
+
+  <button id="doge-btn" onclick="handleClick(event)" title="Click the doge!">
+    <img src="doge.png" alt="doge">
+  </button>
+
+  <div id="shop">
+    <h2>🛒 Shop</h2>
+
+    <div class="shop-item" id="item-1">
+      <div class="shop-info">
+        <div class="shop-name">Doge Paw</div>
+        <div class="shop-desc">+1 DogeBux per click</div>
+      </div>
+      <div class="shop-cost" id="cost-1">10 DB</div>
+      <button class="buy-btn" id="buy-1" onclick="buyUpgrade(1)">Buy</button>
+    </div>
+
+    <div class="shop-item" id="item-2">
+      <div class="shop-info">
+        <div class="shop-name">Shibe Squad</div>
+        <div class="shop-desc">+10 DogeBux per click</div>
+      </div>
+      <div class="shop-cost" id="cost-2">100 DB</div>
+      <button class="buy-btn" id="buy-2" onclick="buyUpgrade(2)">Buy</button>
+    </div>
+
+    <div class="shop-item" id="item-3">
+      <div class="shop-info">
+        <div class="shop-name">Much Wow Generator</div>
+        <div class="shop-desc">+100 DogeBux per click</div>
+      </div>
+      <div class="shop-cost" id="cost-3">1000 DB</div>
+      <button class="buy-btn" id="buy-3" onclick="buyUpgrade(3)">Buy</button>
+    </div>
+
+    <div class="shop-item" id="item-4">
+      <div class="shop-info">
+        <div class="shop-name">Doge to the Moon 🌕</div>
+        <div class="shop-desc">+1000 DogeBux per click</div>
+      </div>
+      <div class="shop-cost" id="cost-4">10000 DB</div>
+      <button class="buy-btn" id="buy-4" onclick="buyUpgrade(4)">Buy</button>
+    </div>
+  </div>
+
+  <div class="footer-row">
+    <button class="nav-btn" onclick="goHome()">← Home</button>
+    <button class="nav-btn danger" onclick="resetGame()">Reset</button>
+  </div>
+
+<script>
+  const upgrades = [
+    null,
+    { bonus: 1,    baseCost: 10,    cost: 10    },
+    { bonus: 10,   baseCost: 100,   cost: 100   },
+    { bonus: 100,  baseCost: 1000,  cost: 1000  },
+    { bonus: 1000, baseCost: 10000, cost: 10000 },
+  ];
+
+  let state = {
+    money: 0,
+    cps: 1,
+    costs: [null, 10, 100, 1000, 10000]
+  };
+
+  const memes = ['wow','such money','very rich','much doge','amaze','to the moon','so click','wow','very wow'];
+
+  function save() {
+    localStorage.setItem('doogle_state', JSON.stringify(state));
+  }
+
+  function load() {
+    const raw = localStorage.getItem('doogle_state');
+    if (raw) {
+      try {
+        const saved = JSON.parse(raw);
+        state = { ...state, ...saved };
+      } catch(e) {}
+    }
+    render();
+  }
+
+  function render() {
+    document.getElementById('money-val').textContent = formatNum(state.money);
+    document.getElementById('cps-val').textContent = formatNum(state.cps);
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById(`cost-${i}`).textContent = formatNum(state.costs[i]) + ' DB';
+      document.getElementById(`buy-${i}`).disabled = state.money < state.costs[i];
+    }
+  }
+
+  function formatNum(n) {
+    if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
+    if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+    return n.toString();
+  }
+
+  function handleClick(e) {
+    state.money += state.cps;
+    save();
+    render();
+    spawnPop('+' + formatNum(state.cps), e.clientX, e.clientY);
+    // random meme word
+    if (Math.random() < 0.3) {
+      spawnMeme(memes[Math.floor(Math.random()*memes.length)], e.clientX + (Math.random()*60-30), e.clientY);
+    }
+  }
+
+  function spawnPop(text, x, y) {
+    const el = document.createElement('div');
+    el.className = 'click-pop';
+    el.textContent = text;
+    el.style.left = (x - 20) + 'px';
+    el.style.top = (y - 20) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+  }
+
+  function spawnMeme(text, x, y) {
+    const el = document.createElement('div');
+    el.className = 'meme-word';
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top = (y - 40) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  }
+
+  function buyUpgrade(id) {
+    if (state.money < state.costs[id]) return;
+    state.money -= state.costs[id];
+    state.cps += upgrades[id].bonus;
+    state.costs[id] = Math.ceil(state.costs[id] * 2);
+    save();
+    render();
+  }
+
+  function goHome() { window.location.href = 'index.html'; }
+
+  function resetGame() {
+    if (!confirm('wow. reset game? very lose progress?')) return;
+    state = { money: 0, cps: 1, costs: [null, 10, 100, 1000, 10000] };
+    save();
+    render();
+  }
+
+  load();
+</script>
+</body>
 </html>
